@@ -42,6 +42,7 @@ public:
     : DataNode(id, DataType::KeyModulus)
     {
         setName("Q");
+        setLiteral(false);
         // setDataType(DataType::KeyModulus);
     }
 

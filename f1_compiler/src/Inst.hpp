@@ -45,7 +45,9 @@ public:
     void setInstSeqId(uint64_t seq_id) { inst_seq_id = seq_id; }
     uint64_t getInstSeqId() const { return inst_seq_id; }
     InstId getId() const { return _id; }
+    void setDstLabel(NodeDescriptor new_ds) {_dst_label = new_ds;}
     const NodeDescriptor& getDstLabel() const { return _dst_label; }
+    void setSrcLabels(std::vector<NodeDescriptor> vec) { _src_labels = vec; }
     const std::vector<NodeDescriptor>& getSrcLabels() const { return _src_labels; }
 
 private:
@@ -53,8 +55,6 @@ private:
     InstId _id;
     NodeDescriptor _dst_label;
     std::vector<NodeDescriptor> _src_labels;
-
-    //* 
 };
 
 }

@@ -35,6 +35,10 @@ enum class DataType {
     RnsPoly,
     CoeffVec,
     KeyModulus,
+    UINT32,
+    UINT64,
+    UINT128, // 128bits
+    UINT512, 
 };
 
 class Node {
@@ -47,12 +51,14 @@ public:
     : _id(id)
     , _type(NodeType::None)
     , _dtype(DataType::None)
+    , _is_literal(false)
     {}
 
     Node(uint64_t id, NodeType type)
     : _id(id)
     , _type(type)
     , _reference_id(-1)
+    , _is_literal(false)
     {}
 
     Node(uint64_t id, NodeType type, DataType dtype)
@@ -60,6 +66,7 @@ public:
     , _type(type)
     , _dtype(dtype)
     , _reference_id(-1)
+    , _is_literal(false)
     {}
 
     void addSrc(NodePtr node) {
@@ -94,7 +101,7 @@ public:
     std::string getName() const { return node_name; }
     void setName(std::string name) { node_name = name; }
 
-    std::string getIdentity() {
+    virtual std::string getIdentity() {
 
         std::stringstream ss;
         std::string ref_id_str = (_reference_id != -1) ? std::to_string(_reference_id) : "";
@@ -140,6 +147,10 @@ public:
 
     void setSymbolicName(std::string name) { symbolic_name = name; }
     std::string getSymbolicName() const { return symbolic_name; }
+    void setLiteral(bool is_literal) { _is_literal = is_literal; }
+    bool isLiteral() const {
+        return _is_literal;
+    }
 
 private:
     std::vector<std::shared_ptr<Node>> children;
@@ -150,6 +161,7 @@ private:
     NodeType _type;
     DataType _dtype;
     uint8_t* _data;
+    bool _is_literal;
     bool isRootNode;
     bool isInputNode;
 };

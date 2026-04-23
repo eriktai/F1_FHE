@@ -1,6 +1,6 @@
 
 #include "KeySwitchBackend.hpp"
-#include "model.hpp"
+#include "F1Model.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -50,7 +50,8 @@ int main(void) {
         .degree = degree,
         .modulus_size = L
     };
-    f1::F1Model model(micro_arch_config, software_config);
+    f1::F1TargetMachine target_machine(micro_arch_config, software_config);
+    f1::F1Model model(target_machine);
     model.compile(dag, root_node);
 
     return 0;
