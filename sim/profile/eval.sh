@@ -13,7 +13,7 @@ echo "=== Test Set 2 (degree = 16384) ==="
 
 # echo ""
 # echo "=== Test Set 3 (degree = 8192) ==="
-# Input: 4096 * (degree * 4), Weight: 16384 * 4096 (4 * 4096 * 4096)
+# Input: 4096 * (degree * 1), Weight: (2 * 4096 * 4096) 
 ./figlut_test 8 4096 4096 1 | tee test3_a.log
-# # Input: 4096 * (degree * 8), Weight: 16384 * 4096 (4 * 4096 * 4096)
+# # Input: 4096 * (degree * 8), Weight: (2 * 4096 * 4096)
 ./figlut_test 8 4096 4096 8 | tee test3_b.log
