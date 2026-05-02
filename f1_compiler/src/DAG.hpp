@@ -23,7 +23,8 @@ enum class OperatorCategory {
     INTT,
     NTT,
     ModMul,
-    ModAdd, 
+    ModAdd,
+    FIGLUT, 
 };
 
 enum class DataType {
@@ -38,7 +39,9 @@ enum class DataType {
     UINT32,
     UINT64,
     UINT128, // 128bits
-    UINT512, 
+    UINT512,
+    Tile, 
+    Vec,
 };
 
 class Node {
@@ -52,6 +55,7 @@ public:
     , _type(NodeType::None)
     , _dtype(DataType::None)
     , _is_literal(false)
+    , _cluster_hint(-1)
     {}
 
     Node(uint64_t id, NodeType type)
@@ -59,6 +63,7 @@ public:
     , _type(type)
     , _reference_id(-1)
     , _is_literal(false)
+    , _cluster_hint(-1)
     {}
 
     Node(uint64_t id, NodeType type, DataType dtype)
@@ -67,6 +72,7 @@ public:
     , _dtype(dtype)
     , _reference_id(-1)
     , _is_literal(false)
+    , _cluster_hint(-1)
     {}
 
     void addSrc(NodePtr node) {
@@ -152,6 +158,24 @@ public:
         return _is_literal;
     }
 
+    void setClusterHint(int cluster_id, bool force = true) {
+        // Only apply if forced or if it does not already have a hint
+        if (!force && _cluster_hint != -1) return;
+        _cluster_hint = cluster_id;
+        
+        // Automatically assign the source data (children) to the same cluster
+        // We use force=false here to prevent overwriting hints on shared DAG nodes.
+        // If a child is used by multiple parents in different clusters, or has an
+        // explicit human-assigned hint, the first assigned hint is respected.
+        for (auto& child : children) {
+            if (child) child->setClusterHint(cluster_id, false);
+        }
+    }
+
+    int getClusterHint() const { return _cluster_hint; }
+    
+    bool hasClusterHint() const { return _cluster_hint != -1; }
+
 private:
     std::vector<std::shared_ptr<Node>> children;
     uint64_t _id;
@@ -164,6 +188,7 @@ private:
     bool _is_literal;
     bool isRootNode;
     bool isInputNode;
+    int _cluster_hint;
 };
 
 using NodeDescriptor = std::pair<node_id_t, std::string>;

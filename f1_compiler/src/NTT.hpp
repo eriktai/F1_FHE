@@ -2,6 +2,7 @@
 #define __NTT_HH__
 
 #include "PolynomialRing.hpp"
+#include "VecNode.hpp"
 #include "DAG.hpp"
 
 namespace f1 {
@@ -114,6 +115,22 @@ public:
         return res;
     }
 
+    static void op(CoeffVecNodePtr& dst, CoeffVecNodePtr src1, CoeffVecNodePtr src2, DAG* mp) {
+        auto ma_node = mp->allocNodeAs<ModMulOpNode>();
+        ma_node->operate(src1, src2);
+        dst->addSrc(ma_node);
+    }
+
+    static RnsPolyNodePtr op(RnsPolyNodePtr src1, RnsPolyNodePtr src2, DAG* mp) {
+        auto L = src1->getModulusSize();
+        auto deg = src1->getDegree();
+        auto res = mp->allocNodeAs<RnsPolyNode>(deg, L, mp);
+        for (int i = 0; i < L; i++) {
+            op(res->at(i), src1->at(i), src2->at(i), mp);
+        }
+        return res;
+    }
+
 
 private:
 
@@ -167,6 +184,17 @@ public:
         }
 
         return res;
+    }
+
+    static VecNodePtr tile_opaque_op(VecNodePtr tile1_dst, VecNodePtr tile2, DAG* mp) {
+
+        auto res_tile = VecNodeHelper::createCoeffTile(tile1_dst->getRowDim(), tile1_dst->getColDim(), mp);
+
+        auto ma_node = mp->allocNodeAs<ModAddOpNode>();
+        ma_node->operate(tile1_dst, tile2);
+        res_tile->addSrc(ma_node); 
+        res_tile->setReferenceId(tile1_dst->getEffectiveId()); 
+        return res_tile;
     }
 
 private:

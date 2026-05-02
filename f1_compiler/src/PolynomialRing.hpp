@@ -42,7 +42,7 @@ public:
     : DataNode(id, DataType::KeyModulus)
     {
         setName("Q");
-        setLiteral(false);
+        setLiteral(true);
         // setDataType(DataType::KeyModulus);
     }
 
@@ -71,7 +71,7 @@ public:
     {
         setName("RNS");
         init(dag, degree, L);
-        printf("init size: %lu\n", _coeff_vec_nodes.size());
+        // printf("init size: %lu\n", _coeff_vec_nodes.size());
         // setDataType(DataType::RnsPoly);
     }
 
@@ -138,6 +138,14 @@ public:
         // setDataType(DataType::Ciphertext);
     }
 
+    CipherTextNode(uint64_t node_id, RnsPolyNodePtr ct0, RnsPolyNodePtr ct1)
+    : DataNode(node_id, DataType::Ciphertext)
+    {
+        setName("CT");
+        rns_polys[0] = ct0;
+        rns_polys[1] = ct1;
+    }
+
     void init(DAG* dag, uint32_t degree, uint32_t L) {
         rns_polys[0] = dag->allocNodeAs<RnsPolyNode>(degree, L, dag);
         rns_polys[1] = dag->allocNodeAs<RnsPolyNode>(degree, L, dag);
@@ -175,6 +183,14 @@ public:
                 rns_polys[i]->at(j)->setSymbolicName(name + "[" + std::to_string(i) + "][" + std::to_string(j) + "]");
             }
         }
+    }
+
+    uint32_t getDegree() const {
+        return rns_polys[0]->getDegree();
+    }
+
+    uint32_t getModulusSize() const {
+        return rns_polys[0]->getModulusSize();
     }
 
 private:

@@ -56,6 +56,7 @@ public:
 
         for (int i = 0; i < L; i++) {
             c2_intt->at(i) = INTTOpNode::op(_c2->at(i), _key_modulus[i], mp);
+            c2_intt->at(i)->setClusterHint(i);
         }
         c2_intt->annotate("c2_intt");
 
@@ -77,6 +78,7 @@ public:
                 u0->at(j) = ModAddOpNode::accumulate_op(u0->at(j), 
                                                    mm0,
                                                    mp);
+                u0->at(j)->setClusterHint(j);
                 u0->at(j)->setSymbolicName("u0[" + std::to_string(j) + "]");
 
                 auto mm1 = ModMulOpNode::op(c2j, _ksk->at(i, 1, j), mp);
@@ -84,6 +86,7 @@ public:
                 u1->at(j) = ModAddOpNode::accumulate_op(u1->at(j), 
                                                     mm1,
                                                     mp);
+                u1->at(j)->setClusterHint(j);
                 u1->at(j)->setSymbolicName("u1[" + std::to_string(j) + "]");
                 
             }

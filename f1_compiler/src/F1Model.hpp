@@ -43,6 +43,7 @@ struct ClusterConfig {
     uint32_t num_NTT;
     uint32_t num_MM;
     uint32_t num_MA;
+    uint32_t num_mshr;
 
     NTTConfig ntt_config;
     ALUConfig mm_config;
@@ -246,7 +247,7 @@ private:
 class RegisterFile {
 public:
     RegisterFile(uint64_t num_registers, uint64_t register_size)
-    : _allocator(num_registers * 2) 
+    : _allocator(num_registers * register_size) 
     , _num_registers(num_registers)
     , _register_size(register_size)
     {}
@@ -443,6 +444,15 @@ struct F1TargetMachine {
     {}
 };
 
+struct TemporalSchedulerResult {
+    std::map<uint64_t, std::vector<Inst>> time_series_inst_map;
+    uint64_t total_cycles;
+};
+
+struct F1ModelResult {
+    std::vector<uint64_t> cluster_total_cycles;
+};
+
 // struct F1ModelContext {
 // public:
 
@@ -458,12 +468,21 @@ struct SpatialMappingResult {
 };
 
 class SpatialScheduler {
+    RoundRobinScheduler rr_sched;
 public:
+    SpatialScheduler(int n)
+    : rr_sched(n) {}
 
     uint32_t clusterAllocation(const Inst& inst, const std::map<uint32_t, uint32_t>& candidate_cluster_counts, const std::map<uint32_t, std::vector<Inst>>& cluster_instructions_map, int num_clusters);
 
     SpatialMappingResult schedule(const std::vector<Inst>& instructions, F1ModelContext& context);
+
+private:
+    std::vector<uint32_t> evaluateDataTemporalLocality(const std::map<uint32_t, uint32_t>& candidate_cluster_counts, int num_clusters);
+    std::vector<uint32_t> evaluatePipelineLoad(const Inst& inst, const std::vector<uint32_t>& candidates, const std::map<uint32_t, std::vector<Inst>>& cluster_instructions_map);
 };
+
+struct MemoryLocation;
 
 class LivenessAnalyzer {
 public:
@@ -480,11 +499,15 @@ public:
 
     F1Model(F1TargetMachine target_machine);
 
-    void compile(DAG* dag, CipherTextNodePtr root_node);
+    F1ModelResult compile(DAG* dag, CipherTextNodePtr root_node, std::string working_dir = "", bool enable_logging = false);
 
     void report(const std::vector<std::vector<Inst>>& insts_map, F1ModelContext& context, const std::map<std::string, uint32_t>& data_cluster_map, const std::vector<RegisterFile>& reg_files, std::string outpath = "schedule.out");
 
     void reportTimeSeries(const std::vector<std::map<uint64_t, std::vector<Inst>>>& time_series_insts_map, F1ModelContext& context, const std::map<std::string, uint32_t>& data_cluster_map, std::string outpath = "time_series_schedule.out");
+
+    void reportMemoryLocation(const std::vector<std::map<uint64_t, std::vector<Inst>>>& time_series_insts_map, F1ModelContext& context, const std::map<std::string, uint32_t>& data_cluster_map, const std::vector<std::map<std::string, MemoryLocation>>& mem_locations_vec, int max_columns = 8, std::string outpath = "memory_allocation.out");
+
+    void reportInputMemoryLayout(F1ModelContext& context, const std::vector<std::map<std::string, MemoryLocation>>& mem_locations_vec, std::string outpath);
 
     void printInstList(const std::vector<Inst>& insts, F1ModelContext& context, const std::map<std::string, uint32_t>& data_cluster_map, std::string outputpath);
          
@@ -494,13 +517,6 @@ private:
 
     F1TargetMachine _target_machine;
 };
-
-struct TemporalSchedulerResult {
-
-    //* time series
-    std::map<uint64_t, std::vector<Inst>> time_series_inst_map;
-};
-
 class TemporalScheduler {
 
 public:
