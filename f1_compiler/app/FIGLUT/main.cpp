@@ -14,8 +14,8 @@ namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) {
 
-    if (argc < 5) {
-        throw std::runtime_error("Less than four");
+    if (argc < 6) {
+        throw std::runtime_error("./figlut <degree> <M> <K> <N> <N_MPU>");
     }
 
 
@@ -25,11 +25,13 @@ int main(int argc, char* argv[]) {
     uint32_t M = std::atoi(argv[2]);
     uint32_t K = std::atoi(argv[3]);
     uint32_t N = degree * std::atoi(argv[4]);
+    uint32_t N_MPU = std::atoi(argv[5]);
 
     std::cout << "degree: " << degree << std::endl;
     std::cout << "M: " << M << std::endl;
     std::cout << "N: " << N << std::endl;
     std::cout << "K: " << K << std::endl;
+    std::cout << "MPU: " << N_MPU << std::endl;
 
     uint32_t L = 16;
     f1::NTTConfig ntt_config(128, 32, true);
@@ -63,7 +65,7 @@ int main(int argc, char* argv[]) {
         .pe_col = 16,
         .rac_per_pe = 32,
         .mu = 4,
-        .mpu = 32
+        .mpu = N_MPU
     };
 
     f1::GLUTERModel model(figlut_cfg, target_machine);
