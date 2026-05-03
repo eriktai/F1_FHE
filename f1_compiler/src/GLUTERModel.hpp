@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include <filesystem>
+#include <cmath>
 
 namespace f1 {
 
