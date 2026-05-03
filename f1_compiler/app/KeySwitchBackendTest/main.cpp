@@ -9,6 +9,7 @@
 
 #include "DAG.hpp"
 #include "NTT.hpp"
+#include "format.hpp"
 #include "PolynomialRing.hpp"
 
 

@@ -1,6 +1,7 @@
 #include "ClusterModel.hpp"
 #include "Inst.hpp"
 #include "RegisterNode.hpp"
+#include "format.hpp"
 #include <algorithm>
 #include <iostream>
 #include <fstream>

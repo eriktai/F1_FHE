@@ -4,6 +4,7 @@
 #include "DAG.hpp"
 #include "DAGTraversal.hpp"
 #include "Inst.hpp"
+#include "format.hpp"
 
 namespace f1 {
 

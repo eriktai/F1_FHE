@@ -1,6 +1,7 @@
 #ifndef __SRC_DAG_HH__
 #define __SRC_DAG_HH__
 
+#include "format.hpp"
 #include <map>
 #include <vector>
 #include <memory>
