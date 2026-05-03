@@ -2,6 +2,16 @@
 #include <cstdint>
 #include <sys/types.h>
 
+// GCC 13 is the first version to fully support std::format.
+// For older versions like GCC 11, we fall back to the {fmt} library and
+// provide a compatibility alias in the std namespace.
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 13
+#include <fmt/format.h>
+namespace std { using fmt::format; }
+#else
+#include <format>
+#endif
+
 
 namespace f1 {
 
@@ -34,9 +44,7 @@ public:
     }
 
     virtual std::string getIdentity() override {
-        std::stringstream ss;
-        ss << std::format("C{}::{}({}:{})", cluster_id_, getName(), regs_.first, regs_.second);
-        return ss.str();
+        return std::format("C{}::{}({}:{})", cluster_id_, getName(), regs_.first, regs_.second);
     }
     void setSymbolicId(uint64_t id) {
         symbolic_id_ = id;

@@ -5,3 +5,5 @@ add_library(f1_lib
     ClusterModel.cpp
     MemoryAllocator.cpp
 )
+
+target_link_libraries(f1_lib fmt)
